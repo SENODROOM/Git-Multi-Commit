@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node c:/Programming/git-multi-commit/bin/cli.js)",
+      "Bash(echo \"exit=$? \\(expect 1\\)\")",
+      "Bash(echo 'export const bye = \\(\\) => \"bye\";')",
+      "Bash(rm lib/hi.js)",
+      "Bash(rm -rf \"c:/Users/saada/AppData/Local/Temp/claude/c--Programming-git-multi-commit/36e7e860-2c8e-4b1b-9204-5538a3bab357/scratchpad/final\")",
+      "Bash(rm -rf 'C:\\\\Users\\\\saada/.git-multi-commit')"
+    ]
+  }
+}

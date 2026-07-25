@@ -1,0 +1,34 @@
+{
+  "name": "git-multi-commit",
+  "version": "1.0.0",
+  "description": "Commit and push the same work to several independent GitHub repos, each under its own account identity and token.",
+  "type": "module",
+  "bin": {
+    "git-multi-commit": "bin/cli.js"
+  },
+  "exports": "./src/cli.js",
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "git",
+    "github",
+    "commit",
+    "multi-account",
+    "gh",
+    "cli"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.0",
+    "picocolors": "^1.1.1"
+  }
+}
