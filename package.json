@@ -1,6 +1,6 @@
 {
   "name": "git-multi-commit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Commit and push the same work to several independent GitHub repos, each under its own account identity and token.",
   "type": "module",
   "bin": {

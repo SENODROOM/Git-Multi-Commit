@@ -25,19 +25,38 @@ function shouldExclude(relPath) {
  * tracked plus untracked files while honouring .gitignore, so build output and
  * node_modules drop out for free and stay consistent with what the user sees
  * in `git status`.
+ *
+ * Untracked files are included, so there is never a need to `git add` before
+ * running. The flip side is that `-c` reports the *index*, which still lists a
+ * file you deleted from disk but have not staged. Such a path must not survive
+ * into the desired set, or the mirror would treat it as wanted and never prune
+ * it from the destination repos. Filtering on what is actually on disk makes
+ * the result depend on your working tree alone, never on staging state.
  */
 export async function enumerateSource(root) {
+  let candidates;
   if (await isGitRepo(root)) {
     const { stdout } = await git(
       ['ls-files', '-co', '--exclude-standard'],
       { cwd: root },
     );
-    const files = stdout ? stdout.split('\n').map((f) => f.trim()).filter(Boolean) : [];
-    return files.filter((f) => !shouldExclude(f)).sort();
+    candidates = stdout ? stdout.split('\n').map((f) => f.trim()).filter(Boolean) : [];
+  } else {
+    candidates = [];
+    await walk(root, '', candidates);
   }
-  const found = [];
-  await walk(root, '', found);
-  return found.filter((f) => !shouldExclude(f)).sort();
+
+  const present = await Promise.all(
+    candidates.map(async (rel) => {
+      if (shouldExclude(rel)) return null;
+      try {
+        return (await stat(path.join(root, rel))).isFile() ? rel : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+  return present.filter(Boolean).sort();
 }
 
 async function walk(root, rel, out) {

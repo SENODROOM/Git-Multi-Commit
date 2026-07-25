@@ -79,6 +79,27 @@ test('enumerateSource honours .gitignore and never leaks the config or .git', as
   rmSync(root, { recursive: true, force: true });
 });
 
+test('enumerateSource reflects the working tree, not the index', async () => {
+  const root = sandbox();
+  writeFileSync(path.join(root, 'keep.js'), 'keep');
+  writeFileSync(path.join(root, 'gone.js'), 'gone');
+  gitIn(root, 'init', '-q');
+  gitIn(root, 'add', '-A');
+  gitIn(root, '-c', 'user.name=t', '-c', 'user.email=t@e.com', 'commit', '-qm', 'seed');
+
+  // Deleted on disk but the deletion is NOT staged: `git ls-files -c` still
+  // reports it. It must not be treated as content we want, or the mirror would
+  // keep it alive in every destination repo forever.
+  rmSync(path.join(root, 'gone.js'));
+  assert.deepEqual(await enumerateSource(root), ['keep.js']);
+
+  // A brand-new file needs no `git add` to be picked up.
+  writeFileSync(path.join(root, 'fresh.js'), 'fresh');
+  assert.deepEqual(await enumerateSource(root), ['fresh.js', 'keep.js']);
+
+  rmSync(root, { recursive: true, force: true });
+});
+
 test('mirrorInto copies content in and propagates deletions out', async () => {
   const base = sandbox();
   const root = path.join(base, 'src');
